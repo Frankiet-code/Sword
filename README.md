@@ -10,6 +10,9 @@ README
 可以直接查看[合集](https://github.com/leipinyuan/Sword/blob/master/%E5%89%91%E6%8C%87offer.md)，也可以在下面找对应题目。
 注意：两者的解法有所不同。
 
+- 下面的题：春招第一次写的，IDEA中，有做题思路，有测试用例。
+- 合集：秋招时写了很多遍之后，孰能生巧写的，有做题思路，无测试用例。
+
 ****
 ## 目录
 * [1. 二维数组中的查找](https://github.com/leipinyuan/Sword/blob/master/src/sword/test1.java)
