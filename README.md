@@ -2,7 +2,7 @@ README
 ===========================
 该项目用来记录《剑指offer》上面的67个题目的解题思路和代码。同时，对部分题目进行了扩展。
 
-leetcode部分的题解，一直（可能永远）都在更新中，见[链接](https://github.com/leipinyuan/Sword/blob/master/leetcode.md)
+leetcode部分的题解，一直（可能永远）都在更新中，见[链接](https://github.com/leipinyuan/Sword/blob/master/leetcode.md)。
 
 |作者|雷品源|
 |---|---
@@ -12,7 +12,7 @@ leetcode部分的题解，一直（可能永远）都在更新中，见[链接](
 可以直接查看[合集](https://github.com/leipinyuan/Sword/blob/master/%E5%89%91%E6%8C%87offer.md)，也可以在下面找对应题目。
 注意：两者的解法有所不同。
 
-- 下面的题：春招第一次写的，IDEA中，有做题思路，有测试用例。
+- 下面的题：春招第一次写的，使用IDEA编辑器，有做题思路，有测试用例。
 - 合集：秋招时写了很多遍之后，孰能生巧写的，有做题思路，无测试用例。
 
 ****
