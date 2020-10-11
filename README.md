@@ -1,7 +1,10 @@
 README
 ===========================
 该项目用来记录《剑指offer》上面的67个题目的解题思路和代码。
+
 leetcode部分的题解，一直（可能永远）都在更新中，见[链接](https://github.com/leipinyuan/Sword/blob/master/leetcode.md)
+
+
 同时，对部分题目进行了扩展。
 ****
 
