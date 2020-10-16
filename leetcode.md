@@ -535,6 +535,161 @@ class Solution {
 
 
 
+## 53.最大子序列和
+
+>给定一个整数数组**nums**，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+>
+>示例: 输入: [-2,1,-3,4,-1,2,1,-5,4]   输出: 6
+>解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
+
+```java
+class Solution {
+    //思路：动态规划的题目，建立dp数组，然后使用局部最优解来做。
+    public int maxSubArray(int[] nums) {
+        if(nums == null || nums.length == 0) return 0;
+        int[] dp = new int[nums.length];
+        dp[0] = nums[0];   //子序列中最少有一个元素
+        int res = dp[0];
+        for(int i = 1;i < nums.length;i++){
+            if(dp[i-1] < 0){
+                dp[i] = nums[i];  //之前的部分序列和小于0，舍弃掉
+            }
+            else{
+                dp[i] = dp[i-1] + nums[i]; //可以借助之前的部分序列和，组成更大的局部序列和
+            }
+            res = Math.max(res, dp[i]);  //看当前的局部最优解，能不能成为全局的最优解
+        }
+        return res;
+    }
+}
+```
+
+## 54.螺旋矩阵
+
+>给定一个包含**m x n**个元素的矩阵（m行, n列），请按照顺时针螺旋顺序，返回矩阵中的所有元素。
+>
+>示例 1: 输入:
+>[ [ 1, 2, 3 ],
+>  [ 4, 5, 6 ],
+>  [ 7, 8, 9 ]]      输出: [1,2,3,6,9,8,7,4,5]
+>示例 2:  输入:
+>[ [1, 2, 3, 4],
+>  [5, 6, 7, 8],
+>  [9,10,11,12]]     输出: [1,2,3,4,8,12,11,10,9,5,6,7]
+
+```java
+class Solution {
+    
+    List<Integer> res = new ArrayList<>();
+    
+    //思路：限定好左上角的坐标和右下角的坐标，然后遍历4个边的数字。
+    public List<Integer> spiralOrder(int[][] matrix) {
+        if(matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+            return res;
+        }
+        helper(matrix, 0, matrix.length-1, 0, matrix[0].length-1);
+        return res;
+    }
+    
+    public void helper(int[][] mat, int i_start, int i_end, int j_start, int j_end){
+        if(i_start > i_end || j_start > j_end) return ;
+        if(i_start == i_end){  //代表此时只剩下一行了
+            while(j_start <= j_end){
+                res.add(mat[i_start][j_start++]);
+            }
+            return ;
+        }
+        if(j_start == j_end){  //代表此时只剩下一列了
+            while(i_start <= i_end){
+                res.add(mat[i_start++][j_start]);
+            }
+            return ;
+        }
+        int i = i_start, j = j_start;  //开始位置
+        while(j <= j_end){
+            res.add(mat[i][j++]);
+        }
+        j--;i++;
+        while(i <= i_end){
+            res.add(mat[i++][j]);
+        }
+        i--;j--;
+        while(j >= j_start){
+            res.add(mat[i][j--]);
+        }
+        j++;i--;
+        while(i > i_start){
+            res.add(mat[i--][j]);
+        }
+        helper(mat, i_start+1, i_end-1, j_start+1, j_end-1);  //再去遍历内层的数字
+    }
+}
+```
+
+
+
+## 59.螺旋矩阵II
+
+>给定一个正整数 n，生成一个包含 1 到 n2 所有元素，且元素按顺时针顺序螺旋排列的正方形矩阵。
+>
+>示例: 输入: 3
+>输出:
+>[ [ 1, 2, 3 ],
+>  [ 8, 9, 4 ],
+>  [ 7, 6, 5 ]]
+
+```java
+class Solution {
+    //思路：沿用螺旋矩阵I的方法就可以了
+    public int[][] generateMatrix(int n) {
+        if(n <= 0) return new int[0][0];
+        int[][] mat = new int[n][n];
+        helper(mat, 0, n-1, 0, n-1, 1);
+        return mat;
+    }
+    
+    //k是当前需要填充的那个数
+    public void helper(int[][] mat,int i_start,int i_end,int j_start,int j_end,int k){
+        if(i_start > i_end || j_start > j_end) return;
+        if(i_start == i_end){
+            // 此时只有一行了
+            while(j_start <= j_end){
+                mat[i_start][j_start++] = k++;
+            }
+            return;
+        }
+        if(j_start == j_end){
+            // 此时只有一列了
+            while(i_start <= i_end){
+                mat[i_start++][j_start] = k++;
+            }
+            return;
+        }
+        int i = i_start, j = j_start;
+        while(j <= j_end){
+            mat[i][j++] = k++;
+        }
+        j--;i++;
+        while(i <= i_end){
+            mat[i++][j] = k++;
+        }
+        i--;j--;
+        while(j >= j_start){
+            mat[i][j--] = k++;
+        }
+        j++;i--;
+        while(i > i_start){
+            mat[i--][j] = k++;
+        }
+        helper(mat, i_start+1, i_end-1, j_start+1, j_end-1, k);
+    }
+}
+```
+
+
+
+
+
 ## 75.颜色分类
 
 >给定一个包含红色、白色和蓝色，一共 n 个元素的数组，**原地对它们进行排序**，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
@@ -661,6 +816,34 @@ class Solution {
     }
 }
 ```
+
+
+
+## 120.买卖股票的最佳时机
+
+>给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。
+>
+>如果你最多只允许完成一笔交易（即买入和卖出一支股票一次），设计一个算法来计算你所能获取的最大利润。
+>
+>注意：你不能在买入股票前卖出股票。
+>
+>示例 1:
+>
+>输入: [7,1,5,3,6,4]
+>输出: 5
+>解释: 在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+>注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；同时，你不能在买入前卖出股票。
+>示例 2:
+>
+>输入: [7,6,4,3,1]
+>输出: 0
+>解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
+
+```java
+
+```
+
+
 
 
 
@@ -1297,6 +1480,227 @@ class Solution {
 }
 ```
 
+## 349.两个数组的交集
+
+>给定两个数组，编写一个函数来计算它们的交集。
+>
+>示例 1：
+>
+>输入：nums1 = [1,2,2,1], nums2 = [2,2]
+>输出：[2]
+>示例 2：
+>
+>输入：nums1 = [4,9,5], nums2 = [9,4,9,8,4]
+>输出：[9,4]
+>
+>**说明：**输出结果中的每个元素一定是唯一的。我们可以不考虑输出结果的顺序。
+
+```java
+class Solution {
+    //思路：使用set去重+记录。
+    public int[] intersection(int[] nums1, int[] nums2) {
+        List<Integer> list = new ArrayList<>();
+        Set<Integer> set = new HashSet<>();
+        for(int num: nums1){
+            set.add(num);
+        }
+        for(int num: nums2){
+            if(set.contains(num)){
+                list.add(num);
+                set.remove(num);
+            }
+        }
+        int[] res = new int[list.size()];
+        int index = 0;
+        for(int num: list){
+            res[index++] = num;
+        }
+        return res;
+    }
+}
+```
+
+## 350.两个数组的交集II
+
+>给定两个数组，编写一个函数来计算它们的交集。
+>
+>示例 1：
+>
+>输入：nums1 = [1,2,2,1], nums2 = [2,2]
+>输出：[2,2]
+>示例 2:
+>
+>输入：nums1 = [4,9,5], nums2 = [9,4,9,8,4]
+>输出：[4,9]
+>
+>说明：输出结果中每个元素出现的次数，应与元素在两个数组中出现次数的最小值一致。
+>      我们可以不考虑输出结果的顺序。
+>进阶：如果给定的数组已经排好序呢？你将如何优化你的算法？
+>	  如果 nums1 的大小比 nums2 小很多，哪种方法更优？
+>	  如果 nums2 的元素存储在磁盘上，内存是有限的，并且你不能一次加载所有的元素到内存中，你该怎么办？
+
+```java
+class Solution {
+    //思路1：先排序，然后使用两个指针从两个数组的开头到尾进行遍历。
+    public int[] intersect(int[] nums1, int[] nums2) {
+        if(nums1 == null || nums1.length == 0) return new int[0];
+        if(nums2 == null || nums2.length == 0) return new int[0];
+        Arrays.sort(nums1);
+        Arrays.sort(nums2);
+        int i = 0, j = 0;
+        List<Integer> list = new ArrayList<>();
+        while(i < nums1.length && j < nums2.length){
+            if(nums1[i] == nums2[j]){
+                list.add(nums1[i]);
+                i++;j++;
+            }
+            else if(nums1[i] < nums2[j]){
+                i++;
+            }
+            else{
+                j++;
+            }
+        }
+        int[] res = new int[list.size()];
+        int index = 0;
+        for(int num: list){
+            res[index++] = num;
+        }
+        return res;
+    }
+    
+    //思路2：用hashmap存放下前一个数组中的数字及其出现的次数
+    public int[] intersect(int[] nums1, int[] nums2) {
+        if(nums1 == null || nums1.length == 0) return new int[0];
+        if(nums2 == null || nums2.length == 0) return new int[0];
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for(int num: nums1){
+            if(!map.containsKey(num)){
+                map.put(num, 1);
+            }
+            else{
+                map.put(num, map.get(num) + 1);
+            }
+        }
+        List<Integer> list = new ArrayList<>();        
+        for(int num: nums2){
+            if(map.containsKey(num) && map.get(num) > 0){
+                list.add(num);
+                map.put(num, map.get(num)-1);
+            }
+        }
+        int[] res = new int[list.size()];
+        int index = 0;
+        for(int num: list){
+            res[index++] = num;
+        }
+        return res;
+    }
+}
+```
+
+## 360.有序转换数组
+
+>给你一个已经**排好序**的整数数组**nums**和整数**a、b、c**。对于数组中的每一个数 x，计算函数值 f(x) = ax2 + bx + c，请将函数值产生的数组返回。
+>
+>要注意，返回的这个数组必须按照**升序排列**，并且我们所期望的解法时间复杂度为 O(n)。
+>
+>示例 1：
+>
+>输入: nums = [-4,-2,2,4], a = 1, b = 3, c = 5
+>输出: [3,9,15,33]
+>示例 2：
+>
+>输入: nums = [-4,-2,2,4], a = -1, b = 3, c = 5
+>输出: [-23,-5,1,7]
+>
+>思路：
+>
+>先判断是否为二次函数。
+>
+>如果是，再判断开口的上下，根据和对称轴点的距离来判断函数值的大小，走双指针的逻辑。
+
+```java
+class Solution {
+//对于一个函数：f(x) = ax2 + bx + c，但函数中的a和b和c的值确定，求x的值是数组中的每一个的时候，得到的f(x)的值
+	//需要保证得到的结果是升序排列的。（注意：时间复杂是O(n)，所以不可以先求出所有的值，在进行排序。）
+	public static int[] sortTransformedArray(int[] nums, int a, int b, int c) {
+		if(nums == null || nums.length == 0) {
+			return new int[0];
+		}
+		int[] res = new int[nums.length];
+		int index = 0;
+		//首先，看a是不是为0，如果是0的话，就当成一个一次函数来做
+		if(a == 0){
+			//一次函数的话，就看b是否为大于0的，如果大于0，就是递增函数；
+			if(b >= 0){
+				for(int i = 0; i < nums.length; i++) {
+					res[index++] = b * nums[i] + c;
+				}
+				return res;
+			}
+			else{
+				for(int i = nums.length-1;i >= 0;i--){
+					res[index++] = b * nums[i] + c;
+				}
+				return res;
+			}
+		}
+		else{
+			//首先找到中心轴的位置，然后找到nums数组中，离中心轴最近的那个数的下标
+			double mid = (-b) / (2.0 * a);
+			int mid_i = findMin(nums, mid);
+			int l = mid_i, r = mid_i+1, left, right;  //双指针
+			//最后，根据二次函数的开口方向，来绝对这个mid_i代表的是最大值，还是最小值
+			if(a > 0){
+				//代表的是最小值
+				while(l >= 0 || r < nums.length){
+					left = (l >= 0) ? a*nums[l]*nums[l]+b*nums[l]+c : Integer.MAX_VALUE;
+					right = (r < nums.length) ? a*nums[r]*nums[r]+b*nums[r]+c : Integer.MAX_VALUE;
+					if(left < right){
+						res[index++] = left;
+						l--;
+					}
+					else{
+						res[index++] = right;
+						r++;
+					}
+				}
+			}
+			else{
+				//代表的是最大值
+				index = nums.length-1;
+				while(l >= 0 || r < nums.length){
+					left = (l >= 0) ? a*nums[l]*nums[l]+b*nums[l]+c : Integer.MIN_VALUE;
+					right = (r < nums.length) ? a*nums[r]*nums[r]+b*nums[r]+c : Integer.MIN_VALUE;
+					if(left > right){
+						res[index--] = left;
+						l--;
+					}
+					else{
+						res[index--] = right;
+						r++;
+					}
+				}
+			}
+		}
+		return res;
+	}
+	
+	private static int findMin(int[] nums, double mid) {
+		int res = 0;
+		double min = Double.MAX_VALUE;
+		for(int i = 0;i < nums.length;i++){
+			if(Math.abs(nums[i] - mid) < min){
+				min = Math.abs(nums[i] - mid);
+				res = i;
+			}
+		}
+		return res;
+	}
+}
+```
+
 
 
 
@@ -1349,6 +1753,49 @@ class Solution {
     }
 }
 ```
+
+
+
+
+
+## 530.二叉搜索树的最小绝对差
+
+>
+>
+>
+
+```java
+class Solution {
+    
+    List<Integer> res = new ArrayList<>();
+    
+    //思路：二叉搜索树的中序遍历是一个有序的数组。相邻之间的两个数的绝对差是最小的。
+    //思路1：这里用一个链表存储下中序遍历的结果。
+    public int getMinimumDifference(TreeNode root) {
+        //树中至少有2个节点，不需要判断root为null
+        InOrder(root);
+        int min = Integer.MAX_VALUE;
+        for(int i = 0;i < res.size()-1;i++){
+            min = Math.min(min, Math.abs(res.get(i) - res.get(i+1)));
+        }
+        return min;
+    }
+    
+    public void InOrder(TreeNode node){
+        if(node.left != null){
+            InOrder(node.left);        
+        }
+        res.add(node.val);
+        if(node.right != null){
+            InOrder(node.right);
+        }
+    }
+}
+```
+
+
+
+
 
 ## 541.反转字符串II
 
@@ -1426,6 +1873,123 @@ class Solution {
 ```
 
 
+
+## 977.有序数组的平方
+
+>给定一个按非递减顺序排序的整数数组**A**，返回每个数字的平方组成的新数组，要求也按非递减顺序排序。
+>
+>示例 1：
+>
+>输入：[-4,-1,0,3,10]
+>输出：[0,1,9,16,100]
+>示例 2：
+>
+>输入：[-7,-3,2,3,11]
+>输出：[4,9,9,49,121]
+>
+>
+>提示：
+>
+>1 <= A.length <= 10000
+>-10000 <= A[i] <= 10000
+>A 已按非递减顺序排序。
+
+```java
+class Solution {
+    //思路：先找到非递减数组中绝对值最小的那个数，然后使用双指针向两侧出发
+    public int[] sortedSquares(int[] A) {
+        if(A == null || A.length == 0){
+            return new int[0];
+        }
+        int[] res = new int[A.length];
+        int index = findMinAbs(A), res_i = 0;
+        int l = index, r = index+1;
+        while(l >= 0 && r < A.length){
+            int sum1 = A[l] * A[l], sum2 = A[r] * A[r];
+            if(sum1 <= sum2){
+                res[res_i++] = sum1;
+                l--;
+            }
+            else{
+                res[res_i++] = sum2;
+                r++;
+            }
+        }
+        while(l >= 0){
+            res[res_i++] = A[l] * A[l--];
+        }
+        while(r < A.length){
+            res[res_i++] = A[r] * A[r++];
+        }
+        return res;
+    }
+    
+    //找到绝对值最小的那个数的下标
+    public int findMinAbs(int[] nums){
+        int min = Integer.MAX_VALUE;
+        int res = 0;
+        for(int i = 0;i < nums.length;i++){
+            if(Math.abs(nums[i]) < min){
+                res = i;
+                min = Math.abs(nums[i]);
+            }
+        }
+        return res;
+    }
+}
+```
+
+
+
+
+
+## 1002.查找常用字符
+
+>给定仅有小写字母组成的字符串数组 A，返回列表中的每个字符串中都显示的全部字符（包括重复字符）组成的列表。例如，如果一个字符在每个字符串中出现 3 次，但不是 4 次，则需要在最终答案中包含该字符 3 次。
+>
+>你可以按任意顺序返回答案。
+>
+>示例 1：
+>
+>输入：["bella","label","roller"]
+>输出：["e","l","l"]
+>示例 2：
+>
+>输入：["cool","lock","cook"]
+>输出：["c","o"]
+
+```java
+class Solution {
+    //思路：因为只需要记得26个英文字母。
+    //用一个数组来记录全局下每个字母出现的次数，另一个数组来记录当前这个字符串中各个字母的情况。
+    public List<String> commonChars(String[] A) {
+        List<String> res = new ArrayList<>();
+        if(A == null || A.length == 0) return res;
+        int[] count = new int[32];
+        for(int i = 0;i < count.length;i++){
+            count[i] = Integer.MAX_VALUE;
+        }
+        int[] c = new int[32];
+        for(String str: A){
+            for(int j = 0;j < str.length();j++){
+                int index = (int)(str.charAt(j) - 'a');
+                c[index] ++;
+            }
+            for(int i = 0;i < 32;i++){
+                count[i] = Math.min(count[i], c[i]);
+                c[i] = 0;  //清空为0
+            }
+        }
+        for(int i = 0;i < 32;i++){
+            while(count[i] != 0){
+                res.add(Character.toString('a'+i));
+                count[i]--;
+            }
+        }
+        return res;
+    }
+}
+```
 
 
 
