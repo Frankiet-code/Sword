@@ -3,7 +3,7 @@
 
 |    作者    |    雷品源   |
 | ---------- | ---------  |
-|   进度     |      45    |
+|   进度     |     53    |
 |   时间     |  20201015  |
 
 ------
@@ -248,6 +248,46 @@ class Solution {
 
 
 
+## 14.最长公共前缀
+
+>编写一个函数来查找字符串数组中的最长公共前缀。
+>
+>如果不存在公共前缀，返回空字符串 ""。
+>
+>示例 1:
+>
+>输入: ["flower","flow","flight"]
+>输出: "fl"
+>示例 2:
+>
+>输入: ["dog","racecar","car"]
+>输出: ""
+>解释: 输入不存在公共前缀。
+>说明:
+>
+>所有输入只包含小写字母 a-z 。
+>
+
+```java
+class Solution {
+    //思路：选中第一个字符串，然后看它的字符在后面其他字符串中是否都依次出现。
+    public String longestCommonPrefix(String[] strs) {
+        if(strs == null || strs.length == 0) return "";
+        StringBuilder res = new StringBuilder();
+        for(int i = 0;i < strs[0].length();i++){
+            char c = strs[0].charAt(i);
+            for(int j = 1;j < strs.length;j++){
+                if(i >= strs[j].length() || strs[j].charAt(i) != c){
+                    return res.toString();   //碰到字符串结尾或者不同的字符，就直接返回了。
+                }
+            }
+            res.append(c);
+        }
+        return res.toString();
+    }
+}
+```
+
 ## 15.三数之和
 
 >给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？请你找出所有满足条件且不重复的三元组。
@@ -394,6 +434,242 @@ class Solution {
     }
 }
 ```
+
+## 19.删除链表的倒数第N个节点
+
+>给定一个链表，删除链表的倒数第 n 个节点，并且返回链表的头结点。
+>
+>示例：
+>
+>给定一个链表: 1->2->3->4->5, 和 n = 2.
+>
+>当删除了倒数第二个节点后，链表变为 1->2->3->5.
+>说明：给定的 n 保证是有效的。
+>
+>进阶：你能尝试使用一趟扫描实现吗？
+>
+
+```java
+class Solution {
+    //思路1：首先计算出链表的总长度，然后计算出我们是删除链表的正序第几个节点
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        if(head == null || n <= 0) return head;
+        int len = 0;
+        ListNode p = head;
+        while(p != null){
+            p = p.next;
+            len += 1;
+        }
+        if(n > len) return head;  //如果只有3个节点，却要删倒数第4个，就直接返回了
+        p = head;
+        n = len - n;  //变成正数第几个节点
+        ListNode pre = null;  //当前节点的前一个节点
+        while(n != 0){
+            pre = p;
+            p = p.next;
+            n -= 1;
+        }
+        if(pre == null){
+            return head.next;  //如果pre没有初始化成正常节点，代表n为0，需要删除首个节点。
+        }
+        else{
+            pre.next = p.next;  //如果初始化为正常节点了，就跳过当前节点。
+        }
+        return head;
+    }
+    
+    //思路2：采用双指针的方式，快的指针先走k个节点，就可以只遍历一遍链表。
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        if(head == null || n <= 0) return head;
+        ListNode fast = head, slow = head, pre = head;
+        while(n != 0){
+            fast = fast.next;
+            n -= 1;
+        }
+        if(fast == null){
+            return head.next;   //如果fast已经为null了，代表删除的就是第一个节点。
+        }
+        while(fast != null){
+            pre = slow;
+            slow = slow.next;
+            fast = fast.next;
+        }
+        pre.next = slow.next;
+        return head;
+    }
+}
+```
+
+## 20.有效的括号
+
+>给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串，判断字符串是否有效。
+>
+>有效字符串需满足：
+>
+>左括号必须用相同类型的右括号闭合。
+>左括号必须以正确的顺序闭合。
+>注意空字符串可被认为是有效字符串。
+>
+>示例 1:
+>
+>输入: "()"
+>输出: true
+>示例 2:
+>
+>输入: "()[]{}"
+>输出: true
+>示例 3:
+>
+>输入: "(]"
+>输出: false
+>示例 4:
+>
+>输入: "([)]"
+>输出: false
+>示例 5:
+>
+>输入: "{[]}"
+>输出: true
+
+```java
+class Solution {
+    //思路1：使用栈来做，遇到匹配的括号的时候，就弹出栈顶元素，最后判断栈是不是为空就行。
+    public boolean isValid(String s) {
+        if(s == null || s.length() == 0) return true;
+        Stack<Character> stack = new Stack<>();
+        for(int i = 0;i < s.length();i++){
+            if(stack.isEmpty() || (!match(stack.peek(), s.charAt(i)))){
+                stack.push(s.charAt(i)); //栈为空，或者不匹配的时候，继续压栈。
+            }
+            else{
+                stack.pop();
+            }
+        }
+        return stack.isEmpty();
+    }
+    
+    public boolean match(char c1, char c2){
+        if((c1 == '(' && c2 == ')')||(c1 == '[' && c2 == ']')||(c1 =='{'&&c2 =='}')){
+            return true;
+        }
+        return false;
+    }
+    
+    //思路2：同样使用栈来做，遇到匹配的括号的时候，就弹出栈顶元素，最后判断栈是不是为空就行。
+    //与思路1的区别是，这里不再用match函数来进行匹配判定，而是用一个map来存放匹配信息。
+    public boolean isValid(String s) {
+        if(s == null || s.length() == 0) return true;
+        HashMap<Character, Character> map = new HashMap<>();
+        map.put(')', '(');  //用来寻找前面半部分括号
+        map.put(']', '[');
+        map.put('}', '{');
+        Stack<Character> stack = new Stack<>();
+        for(int i = 0;i < s.length();i++){
+            char c = s.charAt(i);
+            if(map.containsKey(c)){
+                //先判断是不是右边部分，是的话，才可能进行匹配
+                if(stack.isEmpty() || stack.peek() != map.get(c)){
+                    return false;  //此时，这个右边括号无法匹配，会一直留着，直接返回false
+                }
+                else{
+                    stack.pop();   
+                }
+            }
+            else{
+                stack.push(c);
+            }
+        }
+        return stack.isEmpty();
+    }
+    
+    //思路3:循环使用java中的replace函数，将相连的{} / [] / ()，用""进行替换，最后看长度是不是0
+    public boolean isValid(String s) {
+        int len;
+        do{
+            len = s.length();
+            s = s.replace("()", "").replace("[]", "").replace("{}", "");
+        } while(len != s.length());
+        return s.length() == 0;
+    }
+}
+```
+
+- **小知识点回顾**：栈是先进后出，是一种逻辑结构。在数据结构中，分物理结构和逻辑结构两种。像数组（又称顺序存储）、链表（又称链式存储）这些实实在在实现在物理上的东西，是物理结构；而栈、队列、树、堆、图等等数据结构，我们可以通过数组和链表这样的物理结构去实现，它们都称为逻辑结构。
+- 这个时候，可能面试题就来了，让你**实现一个栈看看？**
+- 等你用数组或者链表实现了简单的栈，面试官又会让你实现一些变种题，比如：155题的最小栈，或者延伸到其他数据结构上去，比如：232用栈实现队列。或者像225那样用队列来实现一个栈。
+
+```java
+//用数组实现一个栈，用来存放类型为Object的数据，提供初始化、入栈、出栈、判空等基本功能，支持自动扩容，并提供测试用例。
+/**
+ * @Author: lei
+ * @Date: 2020/10/18 16:10
+ * @Description: 使用数组实现一个堆栈
+ */
+public class MyStack<E> {
+	
+	private Object[] value;  //存放数据的
+	private int capacity;  //当前容量，需要扩容的话，每次*2
+	private int top = -1;  //栈顶
+	
+	public MyStack(){
+		this.capacity = 10;  //默认容量为10
+		this.value = new Object[capacity];
+	}
+	
+	public MyStack(int capacity){
+		this.capacity = capacity;
+		this.value = new Object[capacity];
+	}
+	
+	public void push(E e){
+		if(top == capacity){
+			this.capacity *= 2;
+		}
+		top++;
+		value[top] = e;
+	}
+	
+	public Object pop() throws Exception {
+		if(top == -1){
+			throw new Exception("the stack is empty.");
+		}
+		else{
+			Object v = value[top];
+			top--;
+			return v;
+		}
+	}
+	
+	public Object peek() throws Exception {
+		if(top == -1){
+			throw new Exception("the stack is empty.");
+		}
+		else{
+			return value[top];
+		}
+	}
+	
+	//判空函数
+	public boolean isEmpty(){
+		return top == -1;
+	}
+	
+	public static void main(String[] args) throws Exception {
+		MyStack myStack = new MyStack();
+		myStack.push(1);
+		myStack.push(1);
+		myStack.push(2);
+		myStack.push(3);
+		System.out.println(myStack.peek());
+		System.out.println(myStack.pop());
+		System.out.println(myStack.pop());
+		System.out.println(myStack.pop());
+		System.out.println(myStack.peek());
+	}
+}//class end
+```
+
+
 
 ## 21.合并两个有序链表
 
@@ -977,7 +1253,7 @@ public class Solution {
 }
 ```
 
-## 142.环形链表II
+## 142.环形链表
 
 >给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
 >
@@ -1128,6 +1404,74 @@ class Solution {
 }
 ```
 
+## 155.最小栈
+
+>设计一个支持 push ，pop ，top 操作，并能在常数时间内检索到最小元素的栈。
+>
+>push(x) —— 将元素 x 推入栈中。
+>pop() —— 删除栈顶的元素。
+>top() —— 获取栈顶元素。
+>getMin() —— 检索栈中的最小元素。
+>
+>
+>示例:
+>
+>输入：
+>["MinStack","push","push","push","getMin","pop","top","getMin"]
+>[[],[-2],[0],[-3],[],[],[],[]]
+>
+>输出：
+>[null,null,null,null,-3,null,0,-2]
+>
+>解释：
+>MinStack minStack = new MinStack();
+>minStack.push(-2);
+>minStack.push(0);
+>minStack.push(-3);
+>minStack.getMin();   --> 返回 -3.
+>minStack.pop();
+>minStack.top();      --> 返回 0.
+>minStack.getMin();   --> 返回 -2.
+
+```java
+class MinStack {
+
+    Stack<Integer> stack = new Stack<>();
+    int min = Integer.MAX_VALUE;
+    
+    /** initialize your data structure here. */
+    public MinStack() {
+        
+    }
+    
+    //如果当前值小于等于min，需要先将min压栈，然后压入x，并更新min的值
+    public void push(int x) {
+        if(x <= min){
+            stack.push(min);
+            min = x;
+        }
+        stack.push(x);
+    }
+    
+    //如果当前出栈是min，就需要再出栈一个元素，作为新的min
+    public void pop() {
+        if(stack.pop() == min){
+            min = stack.pop();
+        }
+    }
+    
+    public int top() {
+        return stack.peek();
+    }
+    
+    public int getMin() {
+        return min;
+    }
+}
+```
+
+
+
 ## 186.翻转字符串里的单词II
 
 >给定一个字符串，逐个翻转字符串中的每个单词。
@@ -1211,6 +1555,214 @@ class Solution {
     }
 }
 ```
+
+
+
+## 206.反转链表
+
+>反转一个单链表。
+>
+>示例:
+>
+>输入: 1->2->3->4->5->NULL
+>输出: 5->4->3->2->1->NULL
+>进阶:
+>你可以迭代或递归地反转链表。你能否用两种方法解决这道题？
+
+```java
+class Solution {
+    //思路1：使用虚拟节点+头插法来做
+    public ListNode reverseList(ListNode head) {
+        if(head == null || head.next == null) {
+            return head;
+        }
+        ListNode dummy = new ListNode(-1);   //虚拟头结点
+        ListNode p = head;
+        while(p != null){
+            ListNode temp = dummy.next;  //先保存好首个有效节点
+            dummy.next = p;
+            p = p.next;  //指针后移
+            dummy.next.next = temp;  //将之前的首个有效节点，连接上去。
+        }
+        return dummy.next;
+    }
+    
+    //思路2：使用递归的方法来做（画个图来做更好）
+    public ListNode reverseList(ListNode head) {
+        if(head == null || head.next == null) {
+            return head;
+        }
+        ListNode p = head.next;  //当前链表的第二个节点，将是未来的倒数第二个节点
+        ListNode newHead = reverseList(head.next);  //新的头结点
+        p.next = head;
+        head.next = null;
+        return newHead;
+    }
+    
+    //思路2换个写法
+    public ListNode reverseList(ListNode head) {
+        if(head == null || head.next == null){
+            return head;
+        }
+        ListNode newHead = reverseList(head.next);  //后面的部分翻转
+        head.next.next = head;  //head.next已经成为了最后一个节点，现在链接上head，将head变成最后一个节点
+        head.next = null;  //最后一个节点的next置为null
+        return newHead;
+    }
+    
+    //思路3：借助先进后出的栈。(该思路性能比较差，没有前面的两种那么巧妙)
+    public ListNode reverseList(ListNode head) {
+        if(head == null || head.next == null) {
+            return head;
+        }
+        Stack<ListNode> stack = new Stack<>();
+        ListNode p = head;
+        while(p != null){
+            stack.push(p);
+            p = p.next;
+        }
+        ListNode newHead = stack.pop();
+        p = newHead;  //指向新的头结点
+        while(!stack.isEmpty()){
+            p.next = stack.pop();
+            p = p.next;
+        }
+        p.next = null;  //最后一个节点next置为null
+        return newHead;
+    }
+}
+```
+
+
+
+## 225.用队列实现栈
+
+>使用队列实现栈的下列操作：
+>
+>push(x) -- 元素 x 入栈
+>pop() -- 移除栈顶元素
+>top() -- 获取栈顶元素
+>empty() -- 返回栈是否为空
+>注意:
+>
+>你只能使用队列的基本操作-- 也就是 push to back, peek/pop from front, size, 和 is empty 这些操作是合法的。
+>你所使用的语言也许不支持队列。 你可以使用 list 或者 deque（双端队列）来模拟一个队列 , 只要是标准的队列操作即可。
+>你可以假设所有操作都是有效的（例如, 对一个空的栈不会调用 pop 或者 top 操作）。
+
+```java
+class MyStack {
+
+    //思路和用队列实现栈是差不多的，这里用两个队列。在pop的时候，将队列中的元素都按照原来的顺序放到另一个队列中，然后将最后一个元素poll出去，从而实现将最早到来的元素先pop出去。
+    Queue<Integer> queue1 = new LinkedList<>();
+    Queue<Integer> queue2 = new LinkedList<>();
+    
+    /** Initialize your data structure here. */
+    public MyStack() {
+        
+    }
+    
+    /** Push element x onto stack. */
+    public void push(int x) {
+        queue1.add(x);
+    }
+    
+    /** Removes the element on top of the stack and returns that element. */
+    public int pop() {
+        if(queue1.size() == 0){
+            return -1;
+        }
+        while(queue1.size() != 1){
+            queue2.add(queue1.poll());
+        }
+        int value = queue1.poll();
+        while(queue2.size() != 0){
+            queue1.add(queue2.poll());
+        }
+        return value;
+    }
+    
+    /** Get the top element. */
+    public int top() {
+       if(queue1.size() == 0){
+            return -1;
+        }
+        int value = pop();
+        queue1.add(value);
+        return value;
+    }
+    
+    /** Returns whether the stack is empty. */
+    public boolean empty() {
+        return (queue1.size() == 0);
+    }
+}
+```
+
+
+
+## 232.用栈实现队列
+
+>使用栈实现队列的下列操作：
+>
+>- push(x) -- 将一个元素放入队列的尾部。
+>- pop() -- 从队列首部移除元素。
+>- peek() -- 返回队列首部的元素。
+>- empty() -- 返回队列是否为空。
+>
+>**示例:**
+>
+>```
+>MyQueue queue = new MyQueue();
+>
+>queue.push(1);
+>queue.push(2);  
+>queue.peek();  // 返回 1
+>queue.pop();   // 返回 1
+>queue.empty(); // 返回 false
+>```
+
+```java
+class MyQueue {
+
+    Stack<Integer> stack1 = new Stack<>();
+    Stack<Integer> stack2 = new Stack<>();
+    
+    //思路：使用两个栈，来做顺序的交换
+    /** Initialize your data structure here. */
+    public MyQueue() {
+
+    }
+    
+    /** Push element x to the back of queue. */
+    public void push(int x) {
+        //先将栈1的元素都压到栈2中
+        while(!stack1.isEmpty()){
+            stack2.push(stack1.pop());
+        }
+        stack2.push(x);
+        while(!stack2.isEmpty()){
+            stack1.push(stack2.pop());
+        }
+    }
+    
+    /** Removes the element from in front of queue and returns that element. */
+    public int pop() {
+        return stack1.pop();
+    }
+    
+    /** Get the front element. */
+    public int peek() {
+        return stack1.peek();
+    }
+    
+    /** Returns whether the queue is empty. */
+    public boolean empty() {
+        return stack1.isEmpty();
+    }
+}
+```
+
+
 
 ## 260.只出现一次的数字III
 
@@ -1874,6 +2426,47 @@ class Solution {
             res.append(strs[i]).append(" ");
         }
         return res.reverse().toString().trim();
+    }
+}
+```
+
+## 716.最大栈
+
+>这个题目和155最小栈类似，基于之前的代码改造一下就可以了。
+
+```java
+class MaxStack {
+
+    Stack<Integer> stack = new Stack<>();
+    int max = Integer.MIN_VALUE;
+    
+    /** initialize your data structure here. */
+    public MaxStack() {
+        
+    }
+    
+    //如果当前值大于等于max，需要先将max压栈，然后压入x，并更新max的值
+    public void push(int x) {
+        if(x >= max){
+            stack.push(max);
+            max = x;
+        }
+        stack.push(x);
+    }
+    
+    //如果当前出栈是max，就需要再出栈一个元素，作为新的max
+    public void pop() {
+        if(stack.pop() == max){
+            max = stack.pop();
+        }
+    }
+    
+    public int top() {
+        return stack.peek();
+    }
+    
+    public int getMax() {
+        return max;
     }
 }
 ```
