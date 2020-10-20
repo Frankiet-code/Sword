@@ -1,11 +1,10 @@
-- 请使用crtl+f，自己搜索题号或者题目名称，就不加目录了。加油！  :blush:
+请使用crtl+f，自己搜索题号或者题目名称，就不加目录了。加油！  :blush:
 
-
+-------
 |    作者    |    雷品源   |
 | ---------- | ---------  |
-|   进度     |     53    |
-|   时间     |  20201015  |
-
+|   进度     |    58    |
+|   时间     |  20201020  |
 ------
 
 # 一、算法题
@@ -1099,6 +1098,43 @@ class Solution {
 }
 ```
 
+## 101.对称二叉树
+
+>给定一个二叉树，检查它是否是镜像对称的。
+>
+>例如，二叉树 [1,2,2,3,4,4,3] 是对称的。
+>
+>    	1
+>       / \
+>      2   2
+>     / \ / \
+>    3  4 4  3
+>
+>但是下面这个 [1,2,2,null,3,null,3] 则不是镜像对称的:
+>
+>    	1
+>       / \
+>      2   2
+>       \   \
+>        3   3
+
+```java
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        if((root == null) || (root.left == null && root.right == null)){
+            return true;
+        }
+        return helper(root.left, root.right);  //使用辅助函数，做对称的比较。
+    }
+    
+    public boolean helper(TreeNode node1, TreeNode node2){
+        if(node1 == null && node2 == null) return true;
+        if(node1 == null || node2 == null || node1.val != node2.val) return false;
+        return helper(node1.left, node2.right) && helper(node1.right, node2.left);
+    }
+}
+```
+
 
 
 ## 120.买卖股票的最佳时机
@@ -1758,6 +1794,107 @@ class MyQueue {
     /** Returns whether the queue is empty. */
     public boolean empty() {
         return stack1.isEmpty();
+    }
+}
+```
+
+## 250.统计同值子树
+
+>做当前这个题目之前，先做一个前序题，找子树中，是否存在两个子树，它们的所有节点的和是否是相同的。
+>
+>比如下面这个二叉树：
+>
+>```77
+>      1
+>   /    \
+>  2      99
+> / \    /  \
+>100  5 0    1
+>```
+>
+>这种情况下，有两个子树，其内部节点的和为100，就返回true。
+
+```java
+class Solution {
+    
+    List<Integer> res = new ArrayList<>();
+    
+    public boolean isSymmetric(TreeNode root){
+        if((root == null) || (root.left == null && root.right == null)){
+            return false;  //节点个数小于等于1，返回false
+        }
+        dfs(root);   //遍历整个树，求出所有存在的子树和
+        //下面判断res中是否存在相同的两个数
+        //System.out.println(res);   //[100, 5, 107, 0, 1, 100, 208]
+        Set<Integer> set = new HashSet<>();
+        for(int num: res){
+            if(set.contains(num)){
+                return true;  //有相同的子树和
+            }
+            else{
+                set.add(num);
+            }
+        }
+        return false;
+    }
+    
+    public int dfs(TreeNode root){
+        if(root == null) return 0;
+        int val = root.val;  //子树的根节点的值
+        if(root.left != null || root.right != null){
+            //此时这个根节点不是原子树的叶子节点
+            val += dfs(root.left) + dfs(root.right);
+        }
+        res.add(val);  //添加这个子树的值
+        return val;  //返回这个值
+    }
+}
+```
+
+>Given a binary tree, count the number of uni-value subtrees.
+>
+>A Uni-value subtree means all nodes of the subtree have the same value.
+>
+>```
+>Example : Input:  root = [5,1,5,5,5,null,5]
+>
+>              5
+>             / \
+>            1   5
+>           / \   \
+>          5   5   5
+>
+>Output: 4
+>```
+>
+>说明：这个题目是说统计这棵树里面，有多少个子树，它们中的任何节点的节点值都是相同的。
+>
+>在例子中，有三个叶子节点值为5，这三个叶子节点又分别是一颗子树，所以这里就有3棵树了；再加上最右边的那个（包含了2个节点值为5的子树）子树，就一共有4个子树，它们所有的节点的节点值都是5。因此返回了4。
+
+```java
+class Solution{
+    
+    //思路：要想子树中的值都是一样的。那么肯定是先判断叶子节点的值是不是相同的，然后再找叶子节点的父节点的值是不是也一样，从而去形成新的有效的子树。
+    int res = 0;
+    
+    public int countUnivalSubtrees(TreeNode root){
+        isSameValue(root);
+        return res;
+    }
+    
+    //当且仅当子树中的值都是一样的时候，返回true。当为空的时候，也返回true。
+    public boolean isSameValue(TreeNode node){
+        if(node == null) return true;
+        boolean left  = isSameValue(node.left);
+        boolean right = isSameValue(node.right);
+        if(left && right){
+            if((node.left != null&&node.val != node.left.val)||(node.right != null&&node.val != node.right.val)){
+                return false;
+            }
+            res++;  //上面没有返回false，才可以进到这里来。
+            return true;
+        }
+        return false;
     }
 }
 ```
@@ -2470,6 +2607,90 @@ class MaxStack {
     }
 }
 ```
+
+## 844.比较含退格的字符串
+
+>给定 S 和 T 两个字符串，当它们分别被输入到空白的文本编辑器后，判断二者是否相等，并返回结果。 # 代表退格字符。
+>
+>注意：如果对空文本输入退格字符，文本继续为空。
+>
+>示例 1：
+>
+>输入：S = "ab#c", T = "ad#c"
+>输出：true
+>解释：S 和 T 都会变成 “ac”。
+>示例 2：
+>
+>输入：S = "ab##", T = "c#d#"
+>输出：true
+>解释：S 和 T 都会变成 “”。
+>示例 3：
+>
+>输入：S = "a##c", T = "#a#c"
+>输出：true
+>解释：S 和 T 都会变成 “c”。
+>示例 4：
+>
+>输入：S = "a#c", T = "b"
+>输出：false
+>解释：S 会变成 “c”，但 T 仍然是 “b”。
+>
+>
+>提示：
+>
+>1 <= S.length <= 200
+>1 <= T.length <= 200
+>S 和 T 只含有小写字母以及字符 '#'。
+>
+>
+>进阶：你可以用 O(N) 的时间复杂度和 O(1) 的空间复杂度解决该问题吗？
+>
+
+```java
+class Solution {
+    //思路1：使用两个栈来存放字符，遇到#，就弹出一个字符出来。然后比较两个栈里面的元素是不是完全一致
+    public boolean backspaceCompare(String S, String T) {
+        if((S == null && T == null) || (S.length() == 0 && T.length() == 0)) return true;
+        if(S == null || T == null || S.length() == 0 || T.length() == 0) return false;
+        Stack<Character> stack1 = new Stack<>();
+        Stack<Character> stack2 = new Stack<>(); 
+        for(int i = 0;i < S.length();i++){
+            char c1 = S.charAt(i);
+            if(c1 == '#'){
+                if(!stack1.isEmpty()){
+                    stack1.pop();  //回退一个
+                }
+            }
+            else{
+                stack1.push(c1);
+            }
+        }
+        for(int i = 0;i < T.length();i++){
+            char c2 = T.charAt(i);
+            if(c2 == '#'){
+                if(!stack2.isEmpty()){
+                    stack2.pop();  //回退一个
+                }
+            }
+            else{
+                stack2.push(c2);
+            }
+        }
+        while(!stack1.isEmpty() && !stack2.isEmpty()){
+            if(stack1.peek() != stack2.peek()){
+                return false;
+            }
+            else{
+                stack1.pop();
+                stack2.pop();
+            }
+        }
+        return stack1.isEmpty() && stack222.isEmpty();
+    }
+}
+```
+
+
 
 
 
