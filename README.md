@@ -1,6 +1,6 @@
 README
 ===========================
-该项目用来记录《剑指offer》上面的67个题目的解题思路和代码。同时，对部分题目进行了扩展。
+该项目用来记录《剑指offer》上面的67个题目的解题思路和代码。同时，对部分题目进行了扩展。加油！  :blush:
 
 leetcode部分的题解，一直（可能永远）都在更新中，见[链接](https://github.com/leipinyuan/Sword/blob/master/leetcode.md)。
 
@@ -84,5 +84,3 @@ leetcode部分的题解，一直（可能永远）都在更新中，见[链接](
 * [65. 机器人的运动范围](https://github.com/leipinyuan/Sword/blob/master/src/sword/test65.java)
 * [66. 机器人的运动范围](https://github.com/leipinyuan/Sword/blob/master/src/sword/test66.java)
 * [67. 剪绳子](https://github.com/leipinyuan/Sword/blob/master/src/sword/test67.java)
-
-加油！  :blush:
