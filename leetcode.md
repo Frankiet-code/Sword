@@ -4,8 +4,8 @@
 
 | 作者 | 雷品源 |
 | :---: |  :----: |
-| 进度 |  58 |
-| 时间 |  20201020  |
+| 进度 |  65 |
+| 时间 |  20201022  |
 
 -------
 # 一、算法题
@@ -149,7 +149,7 @@ class Solution {
 			}
 		}
 		return res;
-	}
+	} 
 	
 	//使用hashSet来存放之前已经遍历过的字符 时间复杂度O(N)
 	public static boolean isUnique(String str){
@@ -370,6 +370,61 @@ class Solution {
                 if(Math.abs(sum-target) < Math.abs(res-target)){
                     res = sum;
                 }
+            }
+        }
+        return res;
+    }
+}
+```
+
+## 17.电话号码的字母组合
+
+>给定一个仅包含数字**2-9**的字符串，返回所有它能表示的字母组合。
+>
+>给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
+>
+>2:abc   3:def   4:ghi   5:jkl  6:mno  7:pqrs   8:tuv    9:wxyz
+>
+>示例：  输入："23"w
+>        输出：["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"].
+>说明:  尽管上面的答案是按字典序排列的，但是你可以任意选择答案输出的顺序。
+
+```java
+class Solution {
+    //思路：首先使用hashmap将数字和字母的对应关系存放起来，然后再根据digits的情况进行字符串的拼接
+    public List<String> letterCombinations(String digits) {
+        List<String> res = new ArrayList<>();
+        if(digits == null || digits.length() == 0){
+            return res;
+        }
+        HashMap<Integer, List<String>> map = new HashMap<>();
+        char c = 'a';
+        for(int i = 2;i <= 9;i++){
+            List<String> list = new ArrayList<>();
+            for(int j = 0;j < 3;j++){
+                list.add(String.valueOf(c++));  //将字符串转换为字符串
+            }
+            if(i == 7 || i == 9){
+                list.add(String.valueOf(c++));
+            }
+            map.put(i, list);
+        }
+        for(int i = 0;i < digits.length();i++){
+            List<String> list0 = map.get((int)(digits.charAt(i) - '0'));
+            if(res.size() == 0){
+                for(String s : list0){
+                    res.add(s);
+                }
+            }
+            else{
+                List<String> res_new = new ArrayList<>();
+                for(String s1: list0){
+                    for(String s0: res){
+                        res_new.add(s0+s1);
+                    }
+                }
+                res.clear();  //清空掉原先的列表中的字符串。
+                res.addAll(res_new);  //加入新的字符串列表中的全部元素
             }
         }
         return res;
@@ -815,7 +870,62 @@ class Solution {
 }
 ```
 
+## 45.跳跃游戏II
 
+>给定一个非负整数数组，你最初位于数组的第一个位置。
+>
+>数组中的每个元素代表你在该位置可以跳跃的最大长度。
+>
+>你的目标是使用最少的跳跃次数到达数组的最后一个位置。
+>
+>示例:
+>
+>输入: [2,3,1,1,4]
+>输出: 2
+>解释: 跳到最后一个位置的最小跳跃数是 2。
+>     从下标为 0 跳到下标为 1 的位置，跳 1 步，然后跳 3 步到达数组的最后一个位置。
+>说明: w假设你总是可以到达数组的最后一个位置。
+
+```java
+class Solution {
+    //思路1：直接基于跳跃游戏I中那个思路来修改代码即可。
+    //并且，因为这里需要使用最小的步数，所以应该每次都从前往后看，是否能在i很小的时候，就直接跳到lastPosition
+    //代码没问题，但是经常出现提交超时的情况。
+    public int jump(int[] nums) {
+        if(nums == null || nums.length <= 1) return 0;
+        int lastPosition = nums.length-1;
+        int res = 0;
+        while(lastPosition != 0){
+            for(int i = 0;i < nums.length-1;i++){
+                if(i + nums[i] >= lastPosition){
+                    lastPosition = i;
+                    res++;
+                    break;
+                }
+            }
+        }
+        return res;
+    }
+    
+    //于是换了一个思路：基于跳跃游戏I中的思路II来整的
+    public int jump2(int[] nums) {
+        if(nums.length == 1) return 0;
+        int cur = 0, canReach = 0 + nums[0];  //当前位置，当前能到达的最远位置
+        int res = 0;
+        for(int i = 0;i < nums.length;i++){
+            canReach = Math.max(canReach, i + nums[i]);
+            if(canReach >= nums.length-1) {
+                return res+1;  //已经到达了，就可以直接返回了
+            }
+            if(i == cur){  //这代表是从当前位置起跳的情况下。
+                res++;
+                cur = canReach;
+            }
+        }
+        return res;
+    }
+}
+```
 
 ## 53.最大子序列和
 
@@ -904,6 +1014,113 @@ class Solution {
             res.add(mat[i--][j]);
         }
         helper(mat, i_start+1, i_end-1, j_start+1, j_end-1);  //再去遍历内层的数字
+    }
+}
+```
+
+## 55.跳跃游戏
+
+>给定一个非负整数数组，你最初位于数组的第一个位置。
+>
+>数组中的每个元素代表你在该位置可以跳跃的最大长度。
+>
+>判断你是否能够到达最后一个位置。
+>
+>示例 1:
+>
+>输入: [2,3,1,1,4]
+>输出: true
+>解释: 我们可以先跳 1 步，从位置 0 到达 位置 1, 然后再从位置 1 跳 3 步到达最后一个位置。
+>示例 2:
+>
+>输入: [3,2,1,0,4]
+>输出: false
+>解释: 无论怎样，你总会到达索引为 3 的位置。但该位置的最大跳跃长度是 0 ， 所以你永远不可能到达最后一个位置。
+>
+>注意：这个问题的升级版本是**45：跳跃游戏II**
+
+```java
+class Solution {
+    //思路1：从最后一个位置开始起，检查前面是否有可以跳到那里，是的话，就更新最后一个位置
+    public boolean canJump(int[] nums) {
+        if(nums == null || nums.length <= 1) {
+            return true;
+        }
+        int lastPosition = nums.length - 1;
+        for(int i = nums.length - 2;i >= 0;i--){
+            if(nums[i] + i >= lastPosition){
+                lastPosition = i;   //如果可以跳到的话，就更新lastPosition的值。
+            }
+        }
+        return lastPosition == 0;
+    }
+    
+    //思路2：从头开始，判断每次能够达到的最大位置，如果最大位置已经到达了最后一个地方，就返回true
+    public boolean canJump(int[] nums) {
+        if(nums == null || nums.length <= 1) {
+            return true;
+        }
+        int canReachPostion = 0;  //当前能到的最远位置是0
+        //因为当前只能最远达到canReachPostion，所以，也只能利用到nums[canReachPostion]，还不能利用后面的，除非循环中更新了canReachPostion的值。
+        for(int i = 0;i <= canReachPostion;i++){
+            canReachPostion = Math.max(canReachPostion, i+nums[i]);
+            if(canReachPostion >= nums.length-1){
+                return true;
+            }
+        }
+        return false;
+    }
+}
+```
+
+## 56.合并区间
+
+>给出一个区间的集合，请合并所有重叠的区间。
+>
+>示例 1:
+>
+>输入: intervals = [[1,3],[2,6],[8,10],[15,18]]
+>输出: [[1,6],[8,10],[15,18]]
+>解释: 区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].
+>
+>示例 2:
+>
+>输入: intervals = [[1,4],[4,5]]
+>输出: [[1,5]]
+>解释: 区间 [1,4] 和 [4,5] 可被视为重叠区间。
+>
+>注意：输入类型已于2019年4月15日更改。 请重置默认代码定义以获取新方法签名。
+>
+>提示：**intervals\[i][0] <= intervals\[i][1]**
+>
+
+```java
+class Solution {
+    //思路：首先需要按照开始时间也就是intervals[0]的值进行一个排序，然后从前往后进行排序
+    public int[][] merge(int[][] intervals) {
+        if(intervals == null || intervals.length == 0) {
+            return new int[0][0];
+        }
+        List<Integer> res = new ArrayList<>();
+        Arrays.sort(intervals, (o1, o2)->(o1[0]-o2[0]));  //注意这里写的时候，是o1, o2,不是o1-o2
+        int i = 0;
+        while(i < intervals.length){
+            int start = intervals[i][0];
+            int end = intervals[i][1];
+            while(i+1 < intervals.length && end >= intervals[i+1][0]){//看看后面的区间是否可以合并
+                end = Math.max(end, intervals[i+1][1]);  //进行合并
+                i++;
+            }
+            res.add(start);
+            res.add(end);
+            i++;
+        }
+        int[][] result = new int[res.size()/2][2];
+        for(i = 0;i < res.size()/2;i++){
+            result[i][0] = res.get(2*i);
+            result[i][1] = res.get(2*i+1);
+        }
+        return result;
     }
 }
 ```
@@ -1320,6 +1537,65 @@ public class Solution {
 ```
 
 
+
+## 143.重排链表
+
+>给定一个单链表 *L*：*L*0→*L*1→…→*L**n*-1→*L*n ，
+>将其重新排列后变为： *L*0→*L**n*→*L*1→*L**n*-1→*L*2→*L**n*-2→…
+>
+>你不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
+>
+>**示例 1:**
+>
+>```
+>给定链表 1->2->3->4, 重新排列为 1->4->2->3.
+>```
+>
+>**示例 2:**
+>
+>```
+>给定链表 1->2->3->4->5, 重新排列为 1->5->2->4->3.
+>```
+
+```java
+class Solution {
+    public void reorderList(ListNode head) {
+        if(head == null || head.next == null) return ;
+        //1. 使用快慢指针，找到中间点，将链表分成两部分
+        ListNode fast = head, slow = head;
+        while(fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        //2. 后半部分翻转
+        ListNode p1 = head;
+        ListNode p2 = reverse(slow.next);
+        slow.next = null;
+        //3. 合并两个链表
+        ListNode dummy = new ListNode(-1);
+        ListNode p = dummy;
+        while(p1 != null && p2 != null){
+            p.next = p1;
+            p1 = p1.next;
+            p = p.next;
+            p.next = p2;
+            p2 = p2.next;
+            p = p.next;
+        }
+        if(p1 != null){
+            p.next = p1;
+        }
+    }
+    
+    public ListNode reverse(ListNode head){
+        if(head == null || head.next == null) return head;
+        ListNode p = reverse(head.next);
+        head.next.next = head;
+        head.next = null;
+        return p;
+    }
+}
+```
 
 
 
@@ -2609,6 +2885,55 @@ class MaxStack {
 }
 ```
 
+
+
+## 763.划分字母区间
+
+>字符串 S 由小写字母组成。我们要把这个字符串划分为尽可能多的片段，同一个字母只会出现在其中的一个片段。返回一个表示每个字符串片段的长度的列表。
+>
+>示例 1：
+>
+>输入：S = "ababcbacadefegdehijhklij"
+>输出：[9,7,8]
+>解释： 划分结果为 "ababcbaca", "defegde", "hijhklij"。 每个字母最多出现在一个片段中。
+>像 "ababcbacadefegde", "hijhklij" 的划分是错误的，因为划分的片段数较少。
+>
+>
+>提示： S的长度在[1, 500]之间。  S只包含小写字母 'a' 到 'z' 。
+>
+
+```java
+class Solution {
+    //题目理解：将字符串划分为尽可能多的片段，但是要保证任意两个片段中没有重复的字母
+    //思路：用map记录下每个字符最后一次出现的位置下标;
+    //然后从头开始遍历，根据字符最后一次出现的位置来确定最小片段的长度
+    public List<Integer> partitionLabels(String S) {
+        List<Integer> res = new ArrayList<>();
+		if(S == null || S.length() == 0) {
+			return res;
+		}
+		char c;
+		HashMap<Character, Integer> map = new HashMap<>();
+		for(int i = 0;i < S.length();i++){
+			c = S.charAt(i);
+			map.put(c, i);
+		}
+		int start = 0;
+		while(start < S.length()){
+			int end = map.get(S.charAt(start));  // 当前字符最后一次出现的位置
+			for(int i = start+1;i <= end;i++){
+				end = Math.max(end, map.get(S.charAt(i)));  //还要保证其他字符都仅在一个片段中出现。
+			}
+			res.add(end-start+1);
+			start = end+1;
+		}
+		return res;
+    }
+}
+```
+
+
+
 ## 844.比较含退格的字符串
 
 >给定 S 和 T 两个字符串，当它们分别被输入到空白的文本编辑器后，判断二者是否相等，并返回结果。 # 代表退格字符。
@@ -2692,6 +3017,66 @@ class Solution {
 ```
 
 
+
+## 925.长按键入
+
+>你的朋友正在使用键盘输入他的名字**name**。偶尔，在键入字符 c 时，按键可能会被长按，而字符可能被输入 1 次或多次。
+>
+>你将会检查键盘输入的字符 typed。如果它对应的可能是你的朋友的名字（其中一些字符可能被长按），那么就返回 True。
+>
+>示例 1：
+>
+>输入：name = "alex", typed = "aaleex"
+>输出：true
+>解释：'alex' 中的 'a' 和 'e' 被长按。
+>示例 2：
+>
+>输入：name = "saeed", typed = "ssaaedd"
+>输出：false
+>解释：'e' 一定需要被键入两次，但在 typed 的输出中不是这样。
+>示例 3：
+>
+>输入：name = "leelee", typed = "lleeelee"
+>输出：true
+>示例 4：
+>
+>输入：name = "laiden", typed = "laiden"
+>输出：true
+>解释：长按名字中的字符并不是必要的。
+>
+>提示： name.length <= 1000
+>	  typed.length <= 1000
+>	  name 和 typed 的字符都是小写字母。
+
+```java
+class Solution {
+    //思路：采用两个下标来做比较，记录下当前比较的字符，然后移动
+    public boolean isLongPressedName(String name, String typed) {
+        if(name.length() > typed.length()) return false;
+        int i = 0, j = 0;
+        char pre = ' ';  //记录下typed中的上一个字符
+        while(i < name.length() && j < typed.length()){
+            if(name.charAt(i) == typed.charAt(j)){
+                pre = name.charAt(i);
+                i++;
+                j++;
+            }
+            else{
+                if(typed.charAt(j) == pre){
+                    j++;
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+        while(j < typed.length() && typed.charAt(j) == pre){
+            j++;
+        }
+        return i == name.length() && j == typed.length();
+    }
+}
+```
 
 
 
