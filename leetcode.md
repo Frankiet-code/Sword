@@ -4,8 +4,8 @@
 
 | 作者 | 雷品源 |
 | :---: |  :----: |
-| 进度 |  65 |
-| 时间 |  20201022  |
+| 进度 |  75 |
+| 时间 |  20201029  |
 
 -------
 # 一、算法题
@@ -1353,9 +1353,96 @@ class Solution {
 }
 ```
 
+## 112.路径总和
+
+>给定一个二叉树和一个目标和，判断该树中是否存在根节点到叶子节点的路径，这条路径上所有节点值相加等于目标和。
+>
+>说明: 叶子节点是指没有子节点的节点。
+>
+>示例: 
+>给定如下二叉树，以及目标和 sum = 22，
+>
+>              5
+>             / \
+>            4   8
+>           /   / \
+>          11  13  4
+>         /  \      \
+>        7    2      1
+>返回 true, 因为存在目标和为 22 的根节点到叶子节点的路径 5->4->11->2。
+>
+
+```java
+class Solution {
+    //思路：如果当前点是叶子节点了，就判断一次当前值是不是为0了。如果遇到了null，就返回false；
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if(root == null) return false;
+        sum -= root.val;
+        if(root.left == null && root.right == null){
+            if(sum == 0){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        return hasPathSum(root.left, sum) || hasPathSum(root.right, sum);
+    }
+}
+```
+
+## 113.路径总和II
+
+>给定一个二叉树和一个目标和，找到所有从根节点到叶子节点路径总和等于给定目标和的路径。
+>
+>说明: 叶子节点是指没有子节点的节点。
+>
+>示例:
+>给定如下二叉树，以及目标和 sum = 22，
+>
+>              5
+>             / \
+>            4   8
+>           /   / \
+>          11  13  4
+>         /  \    / \
+>        7    2  5   1
+>返回: [ [5,4,11,2],  [5,8,4,5] ]
+>
+
+```java
+class Solution {
+    //思路：使用一个list来保存当前遍历过的节点值
+    List<List<Integer>> res = new ArrayList<>();
+    List<Integer> cur = new ArrayList<>();
+    
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        if(root == null) {
+            return res;
+        }
+        dfs(root, sum, 0);
+        return res;
+    }
+    
+    public void dfs(TreeNode root, int sum, int sum0){
+        if(root == null) return ;
+        cur.add(root.val);
+        sum0 += root.val;
+        if(root.left == null && root.right == null && sum == sum0){  //当且仅当现在是叶子节点，且相等的时候，才加到res
+            List<Integer> list = new ArrayList<>();
+            list.addAll(cur);
+            res.add(list);
+        }
+        dfs(root.left, sum, sum0);
+        dfs(root.right, sum, sum0);
+        cur.remove(cur.size()-1);
+    }
+}
+```
 
 
-## 120.买卖股票的最佳时机
+
+## 121.买卖股票的最佳时机
 
 >给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。
 >
@@ -1376,10 +1463,80 @@ class Solution {
 >解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
 
 ```java
-
+class Solution {
+    //思路：每次都记录下当前能够得到的最小价格，以及最大利润。
+    public int maxProfit(int[] prices) {
+        if(prices == null || prices.length <= 1) {
+            return 0;
+        }
+        int min_price = Integer.MAX_VALUE, max_profit = 0;
+        for(int price : prices){
+            min_price = Math.min(min_price, price);  //得到最小价格
+            max_profit = Math.max(max_profit, price - min_price);  //得到最大利润（以上两个值的前后顺序是无关的）
+        }
+        return max_profit;
+    }
+}
 ```
 
+## 129.求根到叶子结点的数字之和
 
+>给定一个二叉树，它的每个结点都存放一个 0-9 的数字，每条从根到叶子节点的路径都代表一个数字。
+>
+>例如，从根到叶子节点路径 1->2->3 代表数字 123。
+>
+>计算从根到叶子节点生成的所有数字之和。
+>
+>说明: 叶子节点是指没有子节点的节点。
+>
+>示例 1:
+>
+>输入: [1,2,3]
+>    1
+>   / \
+>  2   3
+>输出: 25
+>解释: 从根到叶子节点路径 1->2 代表数字 12. 从根到叶子节点路径 1->3 代表数字 13. 因此，数字总和 = 12 + 13 = 25.
+>示例 2:
+>
+>输入: [4,9,0,5,1]
+>    4
+>   / \
+>  9   0
+> / \
+>5   1
+>输出: 1026
+>解释:
+>从根到叶子节点路径 4->9->5 代表数字 495.
+>从根到叶子节点路径 4->9->1 代表数字 491.
+>从根到叶子节点路径 4->0 代表数字 40.
+>因此，数字总和 = 495 + 491 + 40 = 1026.
+
+```java
+class Solution {
+    
+    int res = 0;  //存放数字之和
+    
+    public int sumNumbers(TreeNode root) {
+        if(root == null) return res;
+        dfs(root, 0);  //0代表当前路径得到的值还是0
+        return res;
+    }
+    
+    public void dfs(TreeNode root, int cur){
+        if(root == null) return ;
+        cur *= 10;
+        cur += root.val;
+        if(root.left == null && root.right == null){
+            res += cur;  //如果当前节点是叶子节点的话，就需要增加一次res的值。
+        }
+        else{
+            dfs(root.left, cur);
+            dfs(root.right, cur);
+        }
+    }
+}
+```
 
 
 
@@ -1593,6 +1750,71 @@ class Solution {
         head.next.next = head;
         head.next = null;
         return p;
+    }
+}
+```
+
+## 144.二叉树的前序遍历
+
+>给定一个二叉树，返回它的**前序**遍历。
+>
+>示例: 输入: [1,null,2,3] 
+>   1
+>    \
+>     2
+>    /
+>   3 
+>
+>输出: [1,2,3]
+>进阶: 递归算法很简单，你可以通过迭代算法完成吗？
+
+```java
+//思路1：使用递归的方式做
+class Solution {
+    
+    List<Integer> res = new ArrayList<>();
+    
+    public List<Integer> preorderTraversal(TreeNode root) {
+        if(root == null) {
+            return res;
+        }
+        preOrder(root);
+        return res;
+    }
+    
+    public void preOrder(TreeNode root){
+        if(root == null) return;
+        res.add(root.val);
+        preOrder(root.left);
+        preOrder(root.right);
+    }
+}
+
+//思路2：使用栈辅助，采用迭代的方法做。先弹出根节点，并读取val，然后压入右节点，再压入左节点。
+/*
+   1
+  /  \
+ 2    3
+*/
+class Solution {
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+        if(root == null){
+            return res;
+        }
+        Stack<TreeNode> stack = new Stack<>();
+        stack.push(root);
+        while(!stack.isEmpty()){
+            TreeNode node = stack.pop();
+            res.add(node.val);
+            if(node.right != null){
+                stack.push(node.right);
+            }
+            if(node.left != null){
+                stack.push(node.left);
+            }
+        }
+        return res;
     }
 }
 ```
@@ -2075,6 +2297,123 @@ class MyQueue {
 }
 ```
 
+## 233.数字1的个数【待补充】
+
+>给定一个整数 n，计算所有小于等于 n 的非负整数中数字 1 出现的个数。
+>
+>**示例:**
+>
+>```
+>输入: 13
+>输出: 6 
+>解释: 数字 1 出现在以下数字中: 1, 10, 11, 12, 13 。
+>```
+
+```java
+/*
+《编程之美》上这样说:
+    设N = abcde ,其中abcde分别为十进制中各位上的数字。
+    如果要计算百位上1出现的次数，它要受到3方面的影响：百位上的数字，百位以下（低位）的数字，百位以上（高位）的数字。
+    如果百位上数字为0，百位上可能出现1的次数由更高位决定。比如：12013，则可以知道百位出现1的情况可能是：100~199，1100~1199,2100~2199，，...，11100~11199，一共1200个。可以看出是由更高位数字（12）决定，并且等于更高位数字（12）乘以 当前位数（100）。注意：高位数字不包括当前位
+    如果百位上数字为1，百位上可能出现1的次数不仅受更高位影响还受低位影响。比如：12113，则可以知道百位受高位影响出现的情况是：100~199，1100~1199,2100~2199，，....，11100~11199，一共1200个。和上面情况一样，并且等于更高位数字（12）乘以 当前位数（100）。但同时它还受低位影响，百位出现1的情况是：12100~12113,一共14个，等于低位数字（13）+1。 注意：低位数字不包括当前数字
+    如果百位上数字大于1（2~9），则百位上出现1的情况仅由更高位决定，比如12213，则百位出现1的情况是：100~199,1100~1199，2100~2199，...，11100~11199,12100~12199,一共有1300个，并且等于更高位数字+1（12+1）乘以当前位数（100）
+*/
+class Solution {
+    public int countDigitOne(int n) {
+        if (n < 1)
+            return 0;
+        int len = getLenOfNum(n);
+        if (len == 1)
+            return 1;
+        int tmp = (int) Math.pow(10, len - 1);
+        int first = n / tmp; // 获取n的最高位数字
+        int firstOneNum = first == 1 ? n % tmp + 1 : tmp; // 获取n的最高位为1时有多少个数字
+        int otherOneNUm = first * (len - 1) * (tmp / 10); // 在介于n % tmp到n之间的数字中，除了最高位为1，其余各个数字分别为1 的总数和
+        return firstOneNum + otherOneNUm + countDigitOne(n % tmp);
+    }
+    private int getLenOfNum(int n) {
+        int len = 0;
+        while (n != 0) {
+            len++;
+            n /= 10;
+        }
+        return len;
+    }
+}
+```
+
+
+
+## 234.回文链表
+
+>请判断一个链表是否为回文链表。
+>
+>示例 1:
+>
+>输入: 1->2
+>输出: false
+>示例 2:
+>
+>输入: 1->2->3->2->1
+>输出: true
+>进阶：
+>你能否用 O(n) 时间复杂度和 O(1) 空间复杂度解决此题？
+
+```java
+class Solution {
+    //思路：这个题目算是很综合的一个题目，需要分下面的三个步骤来完成
+    //1.使用快慢指针，找到中心点。注意：如果整个链表的个数是奇数的话，后半部分链表中是需要将第一个节点舍弃的，比如示例2.
+    //2.将后半部分链表进行翻转；
+    //3.比较两个部分的链表是不是完全一样的。
+    public boolean isPalindrome(ListNode head) {
+        if(head == null || head.next == null){
+            return true;
+        }
+        //使用快慢指针找到中间节点
+        ListNode mid = findMid(head);
+        //然后对后半部分的链表进行翻转
+        ListNode p1 = head, p2 = reverse(mid);
+        //最后比较p1和p2链表中的节点值是不是完全相同的
+        while(p1 != null && p2 != null){
+            if(p1.val != p2.val){
+                return false;
+            }
+            p1 = p1.next;
+            p2 = p2.next;
+        }
+        return true;
+    }
+    
+    //这里确保了head的节点个数至少是2.
+    public ListNode findMid(ListNode head){
+        ListNode fast = head, slow = head;
+        while(fast != null && fast.next != null){
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        if(fast == null){
+            return slow;  //如果fast变为null，代表整个链表中的节点个数是偶数的。
+        }
+        else{
+            return slow.next;  //此时链表中的节点个数是奇数的。后半部分的链表中的第一个节点需要舍弃。
+        }
+    }
+    
+    //使用递归进行链表翻转
+    public ListNode reverse(ListNode head){
+        if(head == null || head.next == null){
+            return head;
+        }
+        ListNode newHead = reverse(head.next);
+        head.next.next = head;
+        head.next = null;
+        return newHead;
+    }
+}
+```
+
+
+
 ## 250.统计同值子树
 
 >做当前这个题目之前，先做一个前序题，找子树中，是否存在两个子树，它们的所有节点的和是否是相同的。
@@ -2082,11 +2421,11 @@ class MyQueue {
 >比如下面这个二叉树：
 >
 >```77
->      1
->   /    \
->  2      99
-> / \    /  \
->100  5 0    1
+>             1
+>        /    \
+>     2      99
+>   / \    /  \
+>100  5  0    1
 >```
 >
 >这种情况下，有两个子树，其内部节点的和为100，就返回true。
@@ -2172,6 +2511,55 @@ class Solution{
             return true;
         }
         return false;
+    }
+}
+```
+
+## 257.二叉树的所有路径
+
+>给定一个二叉树，返回所有从根节点到叶子节点的路径。
+>
+>说明: 叶子节点是指没有子节点的节点。
+>
+>示例:
+>
+>输入:
+>
+>   1
+> /   \
+>2     3
+> \
+>  5
+>
+>输出: ["1->2->5", "1->3"]
+>
+>解释: 所有根节点到叶子节点的路径为: 1->2->5, 1->3
+>
+
+```java
+class Solution {
+    
+    List<String> res = new ArrayList<>();
+    
+    public List<String> binaryTreePaths(TreeNode root) {
+        if(root == null) {
+            return res;
+        }
+        dfs(root, "");  //当前没有遍历到任何节点，字符串为空
+        return res;
+    }
+    
+    //能进这个函数的都是非null的节点
+    public void dfs(TreeNode root, String cur){
+        cur += String.valueOf(root.val);
+        if(root.left == null && root.right == null){
+            res.add(cur);
+        }
+        else{
+            cur += "->";
+            if(root.left != null) dfs(root.left, cur);
+            if(root.right != null) dfs(root.right, cur);
+        }
     }
 }
 ```
@@ -3016,6 +3404,46 @@ class Solution {
 }
 ```
 
+## 845.数组中的最长山脉
+
+>我们把数组 A 中符合下列属性的任意连续子数组 B 称为 “山脉”：
+>
+>B.length >= 3 存在 0 < i < B.length - 1 使得 B[0] < B[1] < ... B[i-1] < B[i] > B[i+1] > ... > B[B.length - 1]（注意：B 可以是 A 的任意子数组，包括整个数组 A。）
+>
+>给出一个整数数组 A，返回最长 “山脉” 的长度。如果不含有 “山脉” 则返回 0。
+>
+>示例 1：  输入：[2,1,4,7,3,2,5]  输出：5  解释：最长的 “山脉” 是 [1,4,7,3,2]，长度为 5。
+>示例 2：  输入：[2,2,2]  输出：0  解释：不含 “山脉”。
+>
+>
+>提示： 0 <= A.length <= 10000   0 <= A[i] <= 10000
+>
+
+```java
+class Solution {
+    //思路：首先找到合适的山顶，然后从山顶往两侧延伸，找到最长的山脉
+    public int longestMountain(int[] A) {
+        if(A == null || A.length < 3){
+            return 0;
+        }
+        int res = 0;
+        for(int i = 1;i < A.length-1;i++){
+            if(A[i] > A[i-1] && A[i] > A[i+1]){  //当A[i]是最大的时候，位置i是山顶。
+                int left = i-1, right = i+1;
+                while(left >= 0 && A[left] < A[left+1]){
+                    left --;  //向左侧延伸
+                }
+                while(right < A.length && A[right] < A[right-1]){
+                    right ++;  //向右侧延伸
+                }
+                res = Math.max(res, right - left - 1);
+            }
+        }
+        return res;
+    }
+}
+```
+
 
 
 ## 925.长按键入
@@ -3232,9 +3660,100 @@ class Solution{
 }
 ```
 
+## 1209.独一无二的出险次数
+
+>给你一个整数数组 arr，请你帮忙统计数组中每个数的出现次数。
+>
+>如果每个数的出现次数都是独一无二的，就返回 true；否则返回 false。
+>
+>示例 1：
+>
+>输入：arr = [1,2,2,1,1,3]
+>输出：true
+>解释：在该数组中，1 出现了 3 次，2 出现了 2 次，3 只出现了 1 次。没有两个数的出现次数相同。
+>示例 2：
+>
+>输入：arr = [1,2]
+>输出：false
+>示例 3：
+>
+>输入：arr = [-3,0,1,-3,1,1,1,-3,10,0]
+>输出：true
+
+```java
+class Solution {
+    //思路：首先用hashmap存放数字-出现次数，然后用set找是否有数的次数是重复出现的。
+    public boolean uniqueOccurrences(int[] arr) {
+        if(arr == null || arr.length <= 1) return true;
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for(int num: arr){
+            if(!map.containsKey(num)){
+                map.put(num, 1);
+            }
+            else{
+                map.put(num, map.get(num) + 1);
+            }
+        }
+        Set<Integer> set = new HashSet<>();
+        for(int key: map.keySet()){
+            if(set.contains(map.get(key))){
+                return false;
+            }
+            else{
+                set.add(map.get(key));
+            }
+        }
+        return true;
+    }
+}
+```
 
 
 
+## 1365.有多少小于当前数字的数字
+
+>给你一个数组 nums，对于其中每个元素 nums[i]，请你统计数组中比它小的所有数字的数目。
+>
+>换而言之，对于每个 nums[i] 你必须计算出有效的 j 的数量，其中 j 满足 j != i 且 nums[j] < nums[i] 。
+>
+>以数组形式返回答案。
+>
+>示例 1：
+>
+>输入：nums = [8,1,2,2,3]
+>输出：[4,0,1,1,3]
+>解释： 
+>对于 nums[0]=8 存在四个比它小的数字：（1，2，2 和 3）。 
+>对于 nums[1]=1 不存在比它小的数字。
+>对于 nums[2]=2 存在一个比它小的数字：（1）。 
+>对于 nums[3]=2 存在一个比它小的数字：（1）。 
+>对于 nums[4]=3 存在三个比它小的数字：（1，2 和 2）。
+>示例 2：
+>
+>输入：nums = [6,5,4,8]
+>输出：[2,1,0,3]
+>示例 3：
+>
+>输入：nums = [7,7,7,7]
+>输出：[0,0,0,0]
+
+```java
+class Solution {
+    //思路：采用简单的方式，双层循环来做。
+    public int[] smallerNumbersThanCurrent(int[] nums) {
+        if(nums == null || nums.length == 0) return new int[0];
+        int[] res = new int[nums.length];
+        for(int i = 0;i < nums.length;i++){
+            for(int j = 0;j < nums.length;j++){
+                if(nums[j] < nums[i]){  
+                    res[i]++;//这里不需要增加j!=i的判断，因为当相等的时候，他们的值是一样的。
+                }
+            }
+        }
+        return res;
+    }
+}
+```
 
 
 
